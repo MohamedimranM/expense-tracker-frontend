@@ -104,7 +104,7 @@ console.log(stats);
             Total Spending
           </h3>
 
-          <p className="text-2xl sm:text-3xl font-bold text-blue-600 break-words">
+          <p className="text-2xl sm:text-3xl font-bold text-blue-600 wrap-break-word">
             AED {stats.total?.toFixed(2) || '0.00'}
           </p>
         </div>
@@ -139,7 +139,7 @@ console.log(stats);
               Average Expense
             </h3>
 
-            <p className="text-2xl sm:text-3xl font-bold text-purple-600 break-words">
+            <p className="text-2xl sm:text-3xl font-bold text-purple-600 wrap-break-word">
               AED {stats.average?.toFixed(2) || '0.00'}
             </p>
           </div>
@@ -157,7 +157,7 @@ console.log(stats);
             {categoryStats.map(({ category, amount }) => (
               <div key={category}>
                 <div className="flex flex-wrap justify-between gap-2 mb-2">
-                  <span className="text-sm font-medium break-words">
+                  <span className="text-sm font-medium wrap-break-word">
                     {category}
                   </span>
 
@@ -190,14 +190,14 @@ console.log(stats);
             Expenses for {format(date, 'dd MMM yyyy')}
           </h3>
 
-          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-100 overflow-y-auto pr-1">
             {filteredExpenses.map((exp: any) => (
               <div
                 key={exp._id || exp.createdAt}
                 className="p-3 sm:p-4 rounded-lg border border-gray-200 bg-gray-50"
               >
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                  {/* <p className="font-medium text-gray-800 break-words">
+                  {/* <p className="font-medium text-gray-800 wrap-break-word">
                     {exp.description}
                   </p> */}
 
@@ -215,7 +215,7 @@ console.log(stats);
                 </div>
 
                 {exp.notes && (
-                  <p className="text-sm text-gray-600 mt-3 break-words">
+                  <p className="text-sm text-gray-600 mt-3 wrap-break-word">
                     💬 {exp.notes}
                   </p>
                 )}

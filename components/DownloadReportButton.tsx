@@ -15,7 +15,8 @@ export default function DownloadReportButton() {
         params: { filter, date },
         responseType: 'blob',
       });
-      const contentType = (resp.headers && resp.headers['content-type']) || '';
+      // Normalize header value to string to satisfy TypeScript
+      const contentType = String(resp.headers?.['content-type'] ?? '');
 
       // If server returned JSON (e.g., auth error) but axios requested blob,
       // the response will be a blob containing JSON. Detect and show message.
