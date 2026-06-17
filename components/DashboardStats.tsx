@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { dashboardAPI } from '@/lib/api';
 import { format } from 'date-fns';
+import DownloadReportButton from './DownloadReportButton';
 
 interface DashboardStatsProps {
   timeFrame: 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -93,6 +94,9 @@ console.log(stats);
   return (
 
     <div className="space-y-6 px-2 sm:px-4 lg:px-0">
+      <div className="flex justify-end">
+        <DownloadReportButton />
+      </div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="card w-full">
