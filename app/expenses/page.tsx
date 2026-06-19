@@ -12,26 +12,34 @@ export default function ExpensesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50">
         <Navbar />
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">My Expenses</h1>
+        {/* Page header */}
+        <div className="bg-white border-b border-slate-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">My Expenses</h1>
+              <p className="text-xs text-slate-500 mt-0.5">All your expense records in one place</p>
+            </div>
             <button
               onClick={() => setShowModal(true)}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-semibold"
+              className="btn btn-primary"
             >
-              + Add Expense
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Expense
             </button>
           </div>
+        </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
             <ExpensesList onRefresh={refreshTrigger} />
           </div>
         </main>
 
-        {/* Add Expense Modal */}
         <AddExpenseModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}

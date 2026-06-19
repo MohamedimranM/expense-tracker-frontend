@@ -15,58 +15,59 @@ export default function DashboardPage() {
 
   const handleDateChange = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedDate);
-    if (timeFrame === 'daily') {
-      newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
-    } else if (timeFrame === 'weekly') {
-      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
-    } else if (timeFrame === 'monthly') {
-      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
-    } else if (timeFrame === 'yearly') {
-      newDate.setFullYear(newDate.getFullYear() + (direction === 'next' ? 1 : -1));
-    }
+    if (timeFrame === 'daily') newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    else if (timeFrame === 'weekly') newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    else if (timeFrame === 'monthly') newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+    else if (timeFrame === 'yearly') newDate.setFullYear(newDate.getFullYear() + (direction === 'next' ? 1 : -1));
     setSelectedDate(newDate);
   };
 
   const getDateLabel = () => {
     switch (timeFrame) {
-      case 'daily':
-        return format(selectedDate, 'MMMM dd, yyyy');
-      case 'weekly':
-        return `Week of ${format(selectedDate, 'MMM dd, yyyy')}`;
-      case 'monthly':
-        return format(selectedDate, 'MMMM yyyy');
-      case 'yearly':
-        return selectedDate.getFullYear().toString();
+      case 'daily':   return format(selectedDate, 'MMMM dd, yyyy');
+      case 'weekly':  return `Week of ${format(selectedDate, 'MMM dd, yyyy')}`;
+      case 'monthly': return format(selectedDate, 'MMMM yyyy');
+      case 'yearly':  return selectedDate.getFullYear().toString();
     }
   };
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50">
         <Navbar />
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Dashboard</h1>
+        {/* Page header */}
+        <div className="bg-white border-b border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
+              <p className="text-xs text-slate-500 mt-0.5">Track and analyze your expenses</p>
+            </div>
             <button
               onClick={() => setShowModal(true)}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-semibold"
+              className="btn btn-primary"
             >
-              + Add Expense
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Expense
             </button>
           </div>
+        </div>
 
-          {/* Time Frame Selector */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div className="flex gap-4 flex-wrap">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          {/* Time frame + date navigation */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-8">
+            {/* Pill tabs */}
+            <div className="flex gap-1 p-1 bg-slate-100 rounded-xl w-fit mb-5">
               {(['daily', 'weekly', 'monthly', 'yearly'] as const).map((frame) => (
                 <button
                   key={frame}
                   onClick={() => setTimeFrame(frame)}
-                  className={`px-6 py-2 rounded-lg font-medium transition-colors capitalize ${
+                  className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-all capitalize ${
                     timeFrame === frame
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      ? 'bg-white text-violet-700 shadow-sm font-semibold'
+                      : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
                   {frame}
@@ -74,29 +75,35 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* Date Navigation */}
-            <div className="mt-6 flex items-center justify-between">
+            {/* Date nav */}
+            <div className="flex items-center justify-between">
               <button
                 onClick={() => handleDateChange('prev')}
-                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
               >
-                ← Previous
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="hidden sm:inline">Previous</span>
               </button>
-              <span className="text-lg font-semibold">{getDateLabel()}</span>
+
+              <span className="text-sm sm:text-base font-semibold text-slate-800">{getDateLabel()}</span>
+
               <button
                 onClick={() => handleDateChange('next')}
-                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
               >
-                Next →
+                <span className="hidden sm:inline">Next</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
           </div>
 
-          {/* Stats */}
-          <DashboardStats timeFrame={timeFrame} date={selectedDate} />
+          <DashboardStats timeFrame={timeFrame} date={selectedDate} refresh={refreshTrigger} />
         </main>
 
-        {/* Add Expense Modal */}
         <AddExpenseModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
