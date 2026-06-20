@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { billAPI, BillScanResult } from '@/lib/api';
+import { BillScanResult } from '@/lib/api';
+import { parseReceiptText } from '@/lib/parseReceipt';
 
 interface BillScannerProps {
   onScanComplete: (data: BillScanResult) => void;
@@ -12,6 +13,8 @@ export const BillScanner = ({ onScanComplete, onCancel }: BillScannerProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState('');
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -21,19 +24,42 @@ export const BillScanner = ({ onScanComplete, onCancel }: BillScannerProps) => {
     setFile(selected);
     setPreview(URL.createObjectURL(selected));
     setError('');
+    setProgress(0);
   };
 
   const handleScan = async () => {
     if (!file) return;
     setScanning(true);
+    setProgress(0);
+    setStatusText('Loading OCR engine...');
     setError('');
+
     try {
-      const { data } = await billAPI.scan(file);
-      onScanComplete(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to scan bill. Try a clearer photo.');
+      const { default: Tesseract } = await import('tesseract.js');
+
+      const result = await Tesseract.recognize(file, 'eng', {
+        logger: (m: { status: string; progress: number }) => {
+          if (m.status === 'loading tesseract core') {
+            setStatusText('Loading OCR engine...');
+            setProgress(Math.round(m.progress * 20));
+          } else if (m.status === 'initializing api') {
+            setStatusText('Initialising...');
+            setProgress(20 + Math.round(m.progress * 20));
+          } else if (m.status === 'recognizing text') {
+            setStatusText('Reading bill...');
+            setProgress(40 + Math.round(m.progress * 60));
+          }
+        },
+      });
+
+      const parsed = parseReceiptText(result.data.text);
+      onScanComplete(parsed);
+    } catch {
+      setError('Could not read the bill. Try a clearer, well-lit photo.');
     } finally {
       setScanning(false);
+      setProgress(0);
+      setStatusText('');
     }
   };
 
@@ -41,6 +67,8 @@ export const BillScanner = ({ onScanComplete, onCancel }: BillScannerProps) => {
     setPreview(null);
     setFile(null);
     setError('');
+    setProgress(0);
+    setStatusText('');
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -70,12 +98,23 @@ export const BillScanner = ({ onScanComplete, onCancel }: BillScannerProps) => {
       ) : (
         <div className="space-y-3">
           <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-            <img
-              src={preview}
-              alt="Bill preview"
-              className="w-full max-h-52 object-contain"
-            />
+            <img src={preview} alt="Bill preview" className="w-full max-h-52 object-contain" />
           </div>
+
+          {scanning && (
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>{statusText}</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-violet-500 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm">
@@ -87,27 +126,17 @@ export const BillScanner = ({ onScanComplete, onCancel }: BillScannerProps) => {
           )}
 
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleRetake}
-              disabled={scanning}
-              className="flex-1 btn btn-secondary"
-            >
+            <button type="button" onClick={handleRetake} disabled={scanning} className="flex-1 btn btn-secondary">
               Retake
             </button>
-            <button
-              type="button"
-              onClick={handleScan}
-              disabled={scanning}
-              className="flex-1 btn btn-primary"
-            >
+            <button type="button" onClick={handleScan} disabled={scanning} className="flex-1 btn btn-primary">
               {scanning ? (
                 <>
                   <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
-                  Reading bill...
+                  Reading...
                 </>
               ) : (
                 <>
