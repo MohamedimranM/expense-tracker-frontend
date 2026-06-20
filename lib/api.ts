@@ -42,4 +42,21 @@ export const dashboardAPI = {
   getOverview: () => api.get('/dashboard/overview/all'),
 };
 
+export interface BillScanResult {
+  merchant: string;
+  items: string[];
+  totalAmount: number;
+  category: string;
+  date: string | null;
+  notes: string;
+}
+
+export const billAPI = {
+  scan: (imageFile: File) => {
+    const formData = new FormData();
+    formData.append('receipt', imageFile);
+    return api.post<BillScanResult>('/bills/scan', formData);
+  },
+};
+
 export default api;
